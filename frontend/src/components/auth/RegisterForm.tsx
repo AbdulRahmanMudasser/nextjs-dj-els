@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '@/components/AuthProvider';
-import Loading from '../Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import toast from 'react-hot-toast';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -44,8 +44,8 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) {
-  const { register: registerUser, loading } = useAuth();
-  const [error, setError] = useState<string>('');
+  const { register } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -70,22 +70,42 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setError('');
+    setIsLoading(true);
+    
     try {
-      await registerUser(data);
-      onSuccess?.();
+      await register(data);
+      toast.success('Registration successful! Redirecting...', {
+        duration: 2000,
+        position: 'top-right',
+        style: {
+          background: '#10b981',
+          color: '#fff',
+        },
+        icon: '✅',
+      });
+      // Small delay to show success message before redirect
+      setTimeout(() => {
+        onSuccess?.();
+      }, 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed';
+      toast.error(errorMessage, {
+        duration: 6000,
+        position: 'top-right',
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+        },
+        icon: '❌',
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const selectedRole = form.watch('role');
   const isStudent = selectedRole === 'STUDENT';
   const isFaculty = selectedRole === 'FACULTY';
-
-  if (loading) {
-    return <Loading text="Creating Account..." />;
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -105,13 +125,6 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {error && (
-              <Card className="border-red-200 bg-red-50">
-                <CardContent className="pt-6">
-                  <p className="text-red-600">{error}</p>
-                </CardContent>
-              </Card>
-            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Basic Information */}
@@ -435,8 +448,8 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Create Account'}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
         </Form>

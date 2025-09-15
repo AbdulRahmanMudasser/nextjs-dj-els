@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import Loading from '../Loading';
@@ -18,13 +18,20 @@ export default function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, permissions, loading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated && !isRedirecting) {
+      setIsRedirecting(true);
+      router.push('/auth');
+    }
+  }, [loading, isAuthenticated, isRedirecting, router]);
 
   if (loading) {
     return <Loading text="Loading..." />;
   }
 
   if (!isAuthenticated) {
-    router.push('/auth');
     return fallback || <Loading text="Redirecting to login..." />;
   }
 

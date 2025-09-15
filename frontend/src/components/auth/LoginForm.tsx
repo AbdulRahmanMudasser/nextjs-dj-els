@@ -5,17 +5,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '@/components/AuthProvider';
-import Loading from '../Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import toast from 'react-hot-toast';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
+  email_or_username: z.string().min(1, 'Email or username is required'),
   password: z.string().min(1, 'Password is required'),
-  remember_me: z.boolean().default(false),
+  remember_me: z.boolean(),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -26,31 +26,53 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
-  const { login, loading } = useAuth();
-  const [error, setError] = useState<string>('');
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email_or_username: '',
       password: '',
       remember_me: false,
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setError('');
+    setIsLoading(true);
+    
     try {
       await login(data);
-      onSuccess?.();
+      toast.success('Login successful! Redirecting...', {
+        duration: 2000,
+        position: 'top-right',
+        style: {
+          background: '#10b981',
+          color: '#fff',
+        },
+        icon: '✅',
+      });
+      // Small delay to show success message before redirect
+      setTimeout(() => {
+        onSuccess?.();
+      }, 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      toast.error(errorMessage, {
+        duration: 6000,
+        position: 'top-right',
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+        },
+        icon: '❌',
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loading text="Signing in..." />;
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -76,20 +98,15 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-                    {error}
-                  </div>
-                )}
 
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="email_or_username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>Email or Username</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your username" {...field} />
+                        <Input placeholder="Enter your email or username" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -128,8 +145,8 @@ export default function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormPr
                   )}
                 />
 
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Sign in'}
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Signing in...' : 'Sign in'}
                 </Button>
 
                 <div className="text-center">
