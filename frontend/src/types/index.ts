@@ -159,13 +159,14 @@ export interface ApiResponse<T> {
 }
 
 export interface ApiError {
-  detail: string;
+  detail?: string;
+  error?: string;
   [key: string]: any;
 }
 
 // Authentication Types
 export interface LoginForm {
-  username: string;
+  email_or_username: string;
   password: string;
   remember_me: boolean;
 }

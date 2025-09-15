@@ -52,8 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         apiClient.getUserProfile(),
         apiClient.getUserPermissions()
       ]);
-      setUser(profile);
-      setPermissions(userPermissions);
+      setUser(profile as UserProfile);
+      setPermissions(userPermissions as UserPermissions);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
       // Clear invalid token
@@ -72,9 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (formData: LoginForm) => {
-    setLoading(true);
     try {
-      const response = await apiClient.login(formData.username, formData.password, formData.remember_me);
+      const response = await apiClient.login(formData.email_or_username, formData.password, formData.remember_me);
       const { token: authToken } = response;
       
       setToken(authToken);
@@ -83,13 +82,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Fetch user profile and permissions
       await fetchUserData(authToken);
     } catch (error) {
-      setLoading(false);
       throw error;
     }
   };
 
   const register = async (formData: RegisterForm) => {
-    setLoading(true);
     try {
       const response = await apiClient.register(formData);
       const { token: authToken } = response;
@@ -100,10 +97,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Fetch user profile and permissions
       await fetchUserData(authToken);
     } catch (error) {
-      setLoading(false);
       throw error;
     }
   };
+
 
   const logout = async () => {
     try {
