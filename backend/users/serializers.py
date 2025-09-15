@@ -148,8 +148,8 @@ class UserRegistrationSerializer(serializers.Serializer):
 
 class LoginSerializer(serializers.Serializer):
     """
-    Serializer for user login
+    Serializer for user login - supports both email and username
     """
-    username = serializers.CharField()
+    email_or_username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     remember_me = serializers.BooleanField(default=False)

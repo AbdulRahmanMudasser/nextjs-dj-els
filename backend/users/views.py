@@ -6,8 +6,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import transaction
+from django.conf import settings
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+import requests
+import json
 from .models import UserProfile, StudentProfile, FacultyProfile, ParentProfile, LibrarianProfile
 from .serializers import (
     UserProfileSerializer, StudentProfileSerializer, FacultyProfileSerializer,
@@ -160,15 +163,25 @@ def register(request):
 @permission_classes([AllowAny])
 def login_view(request):
     """
-    User login endpoint
+    User login endpoint - supports both email and username
     """
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
-        username = serializer.validated_data['username']
+        email_or_username = serializer.validated_data['email_or_username']
         password = serializer.validated_data['password']
         remember_me = serializer.validated_data.get('remember_me', False)
         
-        user = authenticate(request, username=username, password=password)
+        # Try to authenticate with username first
+        user = authenticate(request, username=email_or_username, password=password)
+        
+        # If username authentication fails, try email authentication
+        if user is None:
+            try:
+                user_obj = User.objects.get(email=email_or_username)
+                user = authenticate(request, username=user_obj.username, password=password)
+            except User.DoesNotExist:
+                user = None
+        
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -193,6 +206,7 @@ def login_view(request):
                     'token': token.key,
                     'user_id': user.id,
                     'username': user.username,
+                    'email': user.email,
                     'role': user.profile.role if hasattr(user, 'profile') else None
                 })
             else:
@@ -250,3 +264,4 @@ def user_permissions(request):
             'can_manage_library': False,
         }
         return Response(permissions)
+
