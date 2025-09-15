@@ -178,30 +178,30 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white text-center shadow-2xl">
-              <Shield className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 text-green-400" />
-              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center shadow-lg">
+              <Shield className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 text-green-600" />
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-900">
                 Secure & Reliable Platform
               </h3>
-              <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
+              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
                 Built with modern security practices and reliable infrastructure 
                 to protect your educational data.
               </p>
               <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
-                <div className="flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-400" />
+                <div className="flex items-center justify-center text-gray-700">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-600" />
                   Data Encryption
                 </div>
-                <div className="flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-400" />
+                <div className="flex items-center justify-center text-gray-700">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-600" />
                   Secure Authentication
                 </div>
-                <div className="flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-400" />
+                <div className="flex items-center justify-center text-gray-700">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-600" />
                   Regular Backups
                 </div>
-                <div className="flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-400" />
+                <div className="flex items-center justify-center text-gray-700">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-2 text-green-600" />
                   Privacy Protection
                 </div>
               </div>
