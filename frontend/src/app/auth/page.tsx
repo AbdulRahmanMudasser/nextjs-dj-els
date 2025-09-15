@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
+import toast from 'react-hot-toast';
 
 type AuthMode = 'login' | 'register';
 
@@ -11,7 +12,6 @@ export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<AuthMode>('login');
-  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const errorParam = searchParams.get('error');
@@ -40,7 +40,15 @@ export default function AuthPage() {
         errorMessage += `: ${decodeURIComponent(detailsParam)}`;
       }
       
-      setError(errorMessage);
+      toast.error(errorMessage, {
+        duration: 6000,
+        position: 'top-right',
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+        },
+        icon: '❌',
+      });
     }
   }, [searchParams]);
 
@@ -50,26 +58,14 @@ export default function AuthPage() {
 
   const switchToLogin = () => {
     setMode('login');
-    setError(''); // Clear error when switching modes
   };
 
   const switchToRegister = () => {
     setMode('register');
-    setError(''); // Clear error when switching modes
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-          <div className="flex">
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {mode === 'login' ? (
         <LoginForm
           onSuccess={handleSuccess}
