@@ -11,6 +11,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 import requests
 import json
+from rbac.permission_manager import PermissionManager
+from rbac.decorators import require_permissions, require_roles
 from .models import UserProfile, StudentProfile, FacultyProfile, ParentProfile, LibrarianProfile
 from .serializers import (
     UserProfileSerializer, StudentProfileSerializer, FacultyProfileSerializer,
@@ -31,12 +33,11 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         """
         Filter profiles based on user permissions
         """
-        try:
-            if hasattr(self.request.user, 'profile') and self.request.user.profile.role == 'ADMIN':
-                return UserProfile.objects.all()
-            else:
-                return UserProfile.objects.filter(user=self.request.user)
-        except UserProfile.DoesNotExist:
+        # Check if user has permission to view all users
+        if PermissionManager.user_has_permission(self.request.user, 'can_view_all_users'):
+            return UserProfile.objects.all()
+        else:
+            # Users can only see their own profile
             return UserProfile.objects.filter(user=self.request.user)
 
     @action(detail=False, methods=['get'])
@@ -236,30 +237,60 @@ def logout_view(request):
 @permission_classes([IsAuthenticated])
 def user_permissions(request):
     """
-    Get user permissions based on role
+    Get user permissions based on RBAC system
     """
     try:
-        profile = request.user.profile
+        # Get user's RBAC permissions
+        user_permissions = PermissionManager.get_user_permissions(request.user)
+        
+        # Get user's roles
+        from rbac.models import UserRoleAssignment
+        from django.db.models import Q
+        
+        role_assignments = UserRoleAssignment.objects.filter(
+            user=request.user,
+            is_active=True
+        ).filter(
+            Q(start_date__lte=timezone.now()) &
+            (Q(end_date__isnull=True) | Q(end_date__gt=timezone.now()))
+        ).select_related('role')
+        
+        roles = [assignment.role.code for assignment in role_assignments]
+        
+        # Get profile role for backward compatibility
+        profile_role = 'STUDENT'  # Default
+        try:
+            profile = request.user.profile
+            profile_role = profile.role
+        except UserProfile.DoesNotExist:
+            pass
+        
+        # Build permissions response
         permissions = {
-            'role': profile.role,
-            'can_manage_users': profile.role == 'ADMIN',
-            'can_manage_courses': profile.role in ['ADMIN', 'FACULTY'],
-            'can_grade_students': profile.role in ['ADMIN', 'FACULTY'],
-            'can_view_grades': profile.role in ['ADMIN', 'FACULTY', 'STUDENT', 'PARENT'],
-            'can_communicate': True,  # All users can communicate
-            'can_access_admin': profile.role == 'ADMIN',
-            'can_manage_library': profile.role in ['ADMIN', 'LIBRARIAN'],
+            'role': profile_role,
+            'rbac_roles': roles,
+            'rbac_permissions': list(user_permissions),
+            # Legacy permissions for backward compatibility
+            'can_manage_users': 'can_create_users' in user_permissions,
+            'can_manage_courses': 'can_create_courses' in user_permissions,
+            'can_grade_students': 'can_grade_assignments' in user_permissions,
+            'can_view_grades': 'can_view_all_submissions' in user_permissions,
+            'can_communicate': 'can_message_users' in user_permissions,
+            'can_access_admin': 'can_access_admin_panel' in user_permissions,
+            'can_manage_library': 'can_generate_reports' in user_permissions,
         }
         return Response(permissions)
-    except UserProfile.DoesNotExist:
+    except Exception as e:
         # Return default permissions for users without profiles
         permissions = {
             'role': 'STUDENT',  # Default role
+            'rbac_roles': [],
+            'rbac_permissions': [],
             'can_manage_users': False,
             'can_manage_courses': False,
             'can_grade_students': False,
-            'can_view_grades': True,
-            'can_communicate': True,
+            'can_view_grades': False,
+            'can_communicate': False,
             'can_access_admin': False,
             'can_manage_library': False,
         }
