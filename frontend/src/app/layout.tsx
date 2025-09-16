@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { PermissionProvider } from "@/contexts/PermissionContext";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -30,7 +31,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          {children}
+          <PermissionProvider>
+            {children}
           <Toaster
             position="top-right"
             reverseOrder={false}
@@ -87,6 +89,7 @@ export default function RootLayout({
               closeButton: true,
             }}
           />
+          </PermissionProvider>
         </AuthProvider>
       </body>
     </html>
