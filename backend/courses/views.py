@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Q
+from rbac.permission_manager import PermissionManager
+from rbac.decorators import require_permissions, require_roles
 from .models import Course, CourseOffering, Enrollment
 from .serializers import (
     CourseSerializer, CourseDetailSerializer,
@@ -35,10 +37,11 @@ class CourseViewSet(viewsets.ModelViewSet):
         Instantiates and returns the list of permissions that this view requires.
         """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAdminUser]
+            permission_classes = [permissions.IsAuthenticated]
+            return [require_permissions(['can_create_courses', 'can_edit_courses', 'can_delete_courses'])(permission()) for permission in permission_classes]
         else:
             permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
+            return [require_permissions(['can_view_courses'])(permission()) for permission in permission_classes]
 
     @action(detail=True, methods=['get'])
     def prerequisites(self, request, pk=None):

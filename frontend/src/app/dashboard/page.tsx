@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { useAuth } from '@/components/AuthProvider';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { usePermissions } from '@/contexts/PermissionContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { AdminGate, FacultyGate, StudentGate, CreateCourseGate, GradeAssignmentsGate, ManageUsersGate } from '@/components/PermissionGate';
 import Layout from '@/components/Layout';
 import Loading from '@/components/Loading';
 
 function DashboardContent() {
   const { user, permissions, logout } = useAuth();
+  const { hasPermission, hasRole, permissions: rbacPermissions, roles } = usePermissions();
 
   if (!user) {
     return <Loading text="Loading dashboard..." />;
@@ -49,6 +52,9 @@ function DashboardContent() {
                 <p className="mt-1 text-sm text-gray-500">
                   {getWelcomeMessage(user.role)}
                 </p>
+                <div className="mt-2 text-xs text-gray-400">
+                  RBAC Roles: {roles.join(', ') || 'None'} | Permissions: {rbacPermissions.length}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">

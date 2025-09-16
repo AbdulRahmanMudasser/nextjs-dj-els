@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'courses',
     'assignments',
     'communications',
+    'rbac',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'rbac.middleware.PermissionCheckMiddleware',
+    'rbac.middleware.RoleHierarchyMiddleware',
+    'rbac.middleware.AuditLogMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.RequestLoggingMiddleware',
