@@ -53,7 +53,12 @@ export default function AuthPage() {
   }, [searchParams]);
 
   const handleSuccess = () => {
-    router.push('/dashboard');
+    const redirect = searchParams.get('redirect');
+    if (redirect) {
+      router.push(redirect);
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   const switchToLogin = () => {
