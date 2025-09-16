@@ -28,6 +28,7 @@ urlpatterns = [
         path('assignments/', include('assignments.urls')),
         path('communications/', include('communications.urls')),
         path('rbac/', include('rbac.urls')),
+        path('admin/', include('admin_panel.urls')),
     ])),
 ]
 
