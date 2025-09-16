@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'assignments',
     'communications',
     'rbac',
+    'admin_panel',
 ]
 
 MIDDLEWARE = [

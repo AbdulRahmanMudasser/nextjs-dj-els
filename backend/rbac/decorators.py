@@ -36,7 +36,7 @@ def require_permissions(permissions, require_all=True):
             has_permissions = []
             for permission in permission_list:
                 has_permission = PermissionManager.user_has_permission(
-                    request.user, permission, request=request
+                    request.user, permission
                 )
                 has_permissions.append(has_permission)
             
@@ -249,7 +249,7 @@ def django_require_permissions(permissions, require_all=True):
             has_permissions = []
             for permission in permission_list:
                 has_permission = PermissionManager.user_has_permission(
-                    request.user, permission, request=request
+                    request.user, permission
                 )
                 has_permissions.append(has_permission)
             
