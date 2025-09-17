@@ -11,6 +11,9 @@ from .views_notifications import (
     delete_notification, create_notification
 )
 from .views_search import search
+from .views_reports import standard_reports_data, standard_reports_list, custom_reports_list, analytics_data
+from .views_system import system_settings, system_metrics, system_alerts, system_logs, backup_status
+from .views_communications import announcements_list, create_announcement, email_templates_list, email_history_list
 from rbac.views import RoleViewSet, PermissionViewSet
 
 router = DefaultRouter()
@@ -40,4 +43,23 @@ urlpatterns = [
     
     # Search
     path('search/', search, name='admin-search'),
+    
+    # Reports endpoints
+    path('reports/standard/data/', standard_reports_data, name='standard-reports-data'),
+    path('reports/standard/list/', standard_reports_list, name='standard-reports-list'),
+    path('reports/custom/', custom_reports_list, name='custom-reports-list'),
+    path('reports/analytics/', analytics_data, name='analytics-data'),
+    
+    # System endpoints
+    path('system/settings/', system_settings, name='system-settings'),
+    path('system/monitoring/metrics/', system_metrics, name='system-metrics'),
+    path('system/monitoring/alerts/', system_alerts, name='system-alerts'),
+    path('system/logs/', system_logs, name='system-logs'),
+    path('system/backups/', backup_status, name='backup-status'),
+    
+    # Communications endpoints
+    path('communications/announcements/', announcements_list, name='announcements-list'),
+    path('communications/announcements/create/', create_announcement, name='create-announcement'),
+    path('communications/templates/', email_templates_list, name='email-templates-list'),
+    path('communications/email-history/', email_history_list, name='email-history-list'),
 ]
