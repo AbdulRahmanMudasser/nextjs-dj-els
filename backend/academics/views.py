@@ -34,10 +34,8 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAdminUser]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
+        # Allow authenticated users for all operations
+        permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     @action(detail=True, methods=['get'])
@@ -95,10 +93,8 @@ class ProgramViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAdminUser]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
+        # Allow authenticated users for all operations
+        permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     @action(detail=True, methods=['get'])
@@ -146,10 +142,8 @@ class SemesterViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAdminUser]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
+        # Allow authenticated users for all operations
+        permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=['get'])
