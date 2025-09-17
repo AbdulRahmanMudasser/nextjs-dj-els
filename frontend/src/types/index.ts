@@ -446,3 +446,112 @@ export interface SubmissionForm {
   is_group_submission: boolean;
   group_members: number[];
 }
+
+// Academic Management Types
+export interface DepartmentForm {
+  name: string;
+  code: string;
+  description: string;
+  head_of_department?: number;
+  established_date: string;
+  contact_email: string;
+  contact_phone: string;
+  location: string;
+  is_active: boolean;
+}
+
+export interface ProgramForm {
+  name: string;
+  code: string;
+  department: number;
+  degree_type: 'BACHELOR' | 'MASTER' | 'PHD' | 'CERTIFICATE' | 'DIPLOMA';
+  duration_years: number;
+  total_credit_hours: number;
+  description: string;
+  admission_requirements: string;
+  is_active: boolean;
+}
+
+export interface SemesterForm {
+  name: string;
+  code: string;
+  start_date: string;
+  end_date: string;
+  registration_start: string;
+  registration_end: string;
+  is_current: boolean;
+  is_active: boolean;
+}
+
+export interface CourseForm {
+  name: string;
+  code: string;
+  department: number;
+  credit_hours: number;
+  course_type: 'CORE' | 'ELECTIVE' | 'LAB' | 'PROJECT' | 'THESIS';
+  level: 'UNDERGRADUATE' | 'GRADUATE' | 'POSTGRADUATE';
+  description: string;
+  prerequisites: number[];
+  corequisites: number[];
+  learning_outcomes: string;
+  is_active: boolean;
+}
+
+// Admin Dashboard Types
+export interface DashboardMetrics {
+  totalUsers: number;
+  totalStudents: number;
+  totalFaculty: number;
+  totalCourses: number;
+  totalDepartments: number;
+  totalPrograms: number;
+  activeEnrollments: number;
+  pendingApprovals: number;
+  systemHealth: SystemHealth;
+  recentActivity: ActivityItem[];
+  userBreakdown: UserBreakdown;
+  courseStatistics: CourseStatistics;
+  enrollmentTrends: EnrollmentTrend[];
+}
+
+export interface SystemHealth {
+  status: 'HEALTHY' | 'WARNING' | 'CRITICAL';
+  uptime: number;
+  databaseStatus: 'CONNECTED' | 'DISCONNECTED';
+  serverLoad: number;
+  memoryUsage: number;
+  diskUsage: number;
+  lastBackup: string;
+  activeUsers: number;
+  systemVersion: string;
+}
+
+export interface ActivityItem {
+  id: number;
+  type: 'USER_LOGIN' | 'USER_REGISTER' | 'COURSE_CREATED' | 'ASSIGNMENT_SUBMITTED' | 'GRADE_POSTED';
+  description: string;
+  user: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+}
+
+export interface UserBreakdown {
+  students: number;
+  faculty: number;
+  admins: number;
+  parents: number;
+  librarians: number;
+}
+
+export interface CourseStatistics {
+  totalCourses: number;
+  activeCourses: number;
+  totalEnrollments: number;
+  averageEnrollment: number;
+}
+
+export interface EnrollmentTrend {
+  month: string;
+  enrollments: number;
+  completions: number;
+}
